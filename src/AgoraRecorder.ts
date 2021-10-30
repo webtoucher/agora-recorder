@@ -38,6 +38,10 @@ export default class AgoraRecorder extends EventEmitter {
         this.initEventHandler()
     }
 
+    get channel(): string {
+        return this.config.channel
+    }
+
     get recordPath(): string {
         return path.resolve(this.config.outputDir, this.config.recordDirTmpl({
             channel: this.config.channel,
