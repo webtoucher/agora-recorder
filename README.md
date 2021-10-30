@@ -1,6 +1,6 @@
 # Agora Recorder
 
-Recording library for Agora.io stream service.
+Recording tool for Agora.io stream service.
 
 ## Prerequisites
 - Agora Account
@@ -34,8 +34,8 @@ Installation is done using the
 $ npm install agora-recorder
 ```
 
-### Demo
-See [example project](https://github.com/webtoucher/agora-recorder-example).
+### Samples
+See [sample projects](https://github.com/webtoucher/agora-recorder-samples).
 
 ## Resources
 - See full API documentation in the [Document Center](https://docs.agora.io/en/)
