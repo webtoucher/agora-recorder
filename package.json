@@ -1,6 +1,6 @@
 {
   "name": "agora-recorder",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Recording tool for Agora.io stream service",
   "repository": "https://github.com/webtoucher/agora-recorder",
   "type": "module",
