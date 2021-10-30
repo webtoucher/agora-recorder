@@ -7,12 +7,47 @@ import { format as formatDate } from 'fecha'
 
 const { RtcRole, RtcTokenBuilder } = AgoraAccessToken;
 
+export { AgoraVideoMixingLayout }
+
 export interface AgoraRecorderConfig {
+
+    /**
+     * Agora application ID.
+     * It can be found on the project settings page.
+     * @see https://console.agora.io/projects
+     * @see https://docs.agora.io/en/Recording/token?platform=Linux
+     */
     appId: string
+
+    /**
+     * Agora application certificate.
+     * It can be found on the project settings page.
+     * @see https://console.agora.io/projects
+     * @see https://docs.agora.io/en/Recording/token?platform=Linux
+     */
     certificate: string
+
+    /**
+     * The name of the channel to be recorded.
+     */
     channel: string,
+
+    /**
+     * The user account of the recording server.
+     * @default agora-recorder
+     */
     account?: string
+
+    /**
+     * Root directory for storing all videos and logs.
+     * @default output
+     */
     outputDir?: string,
+
+    /**
+     * Closure for building name of the subdirectory for storing current channel videos and logs.
+     * @default ({ channel, date }) => `${formatDate(date, 'YYYY-MM-DD')}/${formatDate(date, 'HH:mm:ss')} ${channel}`
+     */
     recordDirTmpl?: ({ channel, date }: { channel: string, date: Date }) => string,
 }
 
@@ -38,10 +73,16 @@ export default class AgoraRecorder extends EventEmitter {
         this.initEventHandler()
     }
 
+    /**
+     * The name of the channel to be recorded.
+     */
     get channel(): string {
         return this.config.channel
     }
 
+    /**
+     * Full path of the directory for storing current channel videos and logs.
+     */
     get recordPath(): string {
         return path.resolve(this.config.outputDir, this.config.recordDirTmpl({
             channel: this.config.channel,
@@ -130,6 +171,9 @@ export default class AgoraRecorder extends EventEmitter {
         })
     }
 
+    /**
+     * Starts to listen the channel and record video.
+     */
     async start(): Promise<boolean> {
         const json = {
             Recording_Dir: this.recordPath,
@@ -161,11 +205,17 @@ export default class AgoraRecorder extends EventEmitter {
         })
     }
 
+    /**
+     * Stops to listen the channel.
+     */
     stop(): void {
         this.sdk.leaveChannel()
         this.sdk.release()
     }
 
+    /**
+     * Sets mix layout.
+     */
     setMixLayout(layout: AgoraVideoMixingLayout): void {
         this.sdk.setMixLayout(layout)
     }
