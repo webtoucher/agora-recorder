@@ -1,4 +1,4 @@
-import AgoraRecorderSdk, { AgoraRecorderEvent, AgoraVideoMixingLayout } from 'agora-recorder-sdk'
+import AgoraRecorderSdk, { AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout } from 'agora-recorder-sdk'
 import AgoraAccessToken from 'agora-access-token'
 import path from 'path'
 import fs, { promises as fsPromises } from 'fs'
@@ -7,7 +7,7 @@ import { format as formatDate } from 'fecha'
 
 const { RtcRole, RtcTokenBuilder } = AgoraAccessToken;
 
-export { AgoraVideoMixingLayout }
+export { AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout }
 
 export interface AgoraRecorderConfig {
 
