@@ -36,7 +36,7 @@ export interface AgoraRecorderConfig {
      * The user account of the recording server.
      * @default agora-recorder
      */
-    account?: string
+    userAccount?: string
 
     /**
      * Root directory for storing all videos and logs.
@@ -57,8 +57,8 @@ export default class AgoraRecorder extends EventEmitter {
 
     constructor(private config: AgoraRecorderConfig) {
         super()
-        if (!config.account) {
-            config.account = 'agora-recorder'
+        if (!config.userAccount) {
+            config.userAccount = 'agora-recorder'
         }
         if (!config.outputDir) {
             config.outputDir = 'output'
@@ -100,13 +100,13 @@ export default class AgoraRecorder extends EventEmitter {
         this.sdk.on(AgoraRecorderEvent.REC_EVENT_ERROR, (err: number, statCode: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_ERROR, err, statCode)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_JOIN, (uid: string | number) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_JOIN, (uid: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_USER_JOIN, uid)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_LEAVE, (uid: string | number) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_LEAVE, (uid: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_USER_LEAVE, uid)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_ACTIVE_SPEAKER, (uid: string | number) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_ACTIVE_SPEAKER, (uid: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_ACTIVE_SPEAKER, uid)
         })
         this.sdk.on(AgoraRecorderEvent.REC_EVENT_CONN_LOST, () => {
@@ -123,11 +123,11 @@ export default class AgoraRecorder extends EventEmitter {
         )
         this.sdk.on(
             AgoraRecorderEvent.REC_EVENT_FIRST_VIDEO_FRAME,
-            (uid: string | number, width: number, height: number, elapsed: number) => {
+            (uid: number, width: number, height: number, elapsed: number) => {
                 this.emit(AgoraRecorderEvent.REC_EVENT_FIRST_VIDEO_FRAME, uid, width, height, elapsed)
             }
         )
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_FIRST_AUDIO_FRAME, (uid: string | number, elapsed: number) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_FIRST_AUDIO_FRAME, (uid: number, elapsed: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_FIRST_AUDIO_FRAME, uid, elapsed)
         })
         this.sdk.on(
@@ -138,35 +138,35 @@ export default class AgoraRecorder extends EventEmitter {
         )
         this.sdk.on(
             AgoraRecorderEvent.REC_EVENT_REMOTE_VIDEO_STREAM_STATE_CHANGED,
-            (uid: string | number, state: number, reason: number) => {
+            (uid: number, state: number, reason: number) => {
                 this.emit(AgoraRecorderEvent.REC_EVENT_REMOTE_VIDEO_STREAM_STATE_CHANGED, uid, state, reason)
             }
         )
         this.sdk.on(
             AgoraRecorderEvent.REC_EVENT_REMOTE_AUDIO_STREAM_STATE_CHANGED,
-            (uid: string | number, state: number, reason: number) => {
+            (uid: number, state: number, reason: number) => {
                 this.emit(AgoraRecorderEvent.REC_EVENT_REMOTE_AUDIO_STREAM_STATE_CHANGED, uid, state, reason)
             }
         )
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REJOIN_SUCCESS, (channel: string, uid: string | number) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REJOIN_SUCCESS, (channel: string, uid: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_REJOIN_SUCCESS, channel, uid)
         })
         this.sdk.on(AgoraRecorderEvent.REC_EVENT_CONN_STATE_CHANGED, (state: number, reason: number) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_CONN_STATE_CHANGED, state, reason)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REMOTE_VIDEO_STATS, (uid: string | number, stats: any) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REMOTE_VIDEO_STATS, (uid: number, stats: any) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_REMOTE_VIDEO_STATS, uid, stats)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REMOTE_AUDIO_STATS, (uid: string | number, stats: any) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_REMOTE_AUDIO_STATS, (uid: number, stats: any) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_REMOTE_AUDIO_STATS, uid, stats)
         })
         this.sdk.on(AgoraRecorderEvent.REC_EVENT_RECORDING_STATS, (stats: any) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_RECORDING_STATS, stats)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_LOCAL_USER_REGISTER, (uid: string | number, account: string) => {
-            this.emit(AgoraRecorderEvent.REC_EVENT_LOCAL_USER_REGISTER, uid, account)
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_LOCAL_USER_REGISTER, (uid: number, userAccount: string) => {
+            this.emit(AgoraRecorderEvent.REC_EVENT_LOCAL_USER_REGISTER, uid, userAccount)
         })
-        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_INFO_UPDATED, (uid: string | number, info: any) => {
+        this.sdk.on(AgoraRecorderEvent.REC_EVENT_USER_INFO_UPDATED, (uid: number, info: { uid: number, userAccount: string }) => {
             this.emit(AgoraRecorderEvent.REC_EVENT_USER_INFO_UPDATED, uid, info)
         })
     }
@@ -186,12 +186,12 @@ export default class AgoraRecorder extends EventEmitter {
                 this.config.appId,
                 this.config.certificate,
                 this.config.channel,
-                this.config.account,
+                this.config.userAccount,
                 RtcRole.SUBSCRIBER,
                 0
             ),
             this.config.channel,
-            this.config.account,
+            this.config.userAccount,
             path.resolve('node_modules', '.bin'),
             cfgPath
         )
