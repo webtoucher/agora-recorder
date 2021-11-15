@@ -1,4 +1,4 @@
-import AgoraRecorderSdk, { AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout } from 'agora-recorder-sdk'
+import AgoraRecorderSdk, { AgoraLogLevel, AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout } from 'agora-recorder-sdk'
 import AgoraAccessToken from 'agora-access-token'
 import path from 'path'
 import fs, { promises as fsPromises } from 'fs'
@@ -7,7 +7,7 @@ import { format as formatDate } from 'fecha'
 
 const { RtcRole, RtcTokenBuilder } = AgoraAccessToken;
 
-export { AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout }
+export { AgoraLogLevel, AgoraRecorderEvent, AgoraRegion, AgoraVideoMixingLayout }
 
 export interface AgoraRecorderConfig {
 
@@ -49,6 +49,13 @@ export interface AgoraRecorderConfig {
      * @default ({ channel, date }) => `${formatDate(date, 'YYYY-MM-DD')}/${formatDate(date, 'HH:mm:ss')} ${channel}`
      */
     recordDirTmpl?: ({ channel, date }: { channel: string, date: Date }) => string,
+
+    /**
+     * Log level.
+     * Only log levels preceding the selected level are generated.
+     * @default AgoraLogLevel.AGORA_LOG_LEVEL_INFO
+     */
+    logLevel?: AgoraLogLevel,
 }
 
 export default class AgoraRecorder extends EventEmitter {
@@ -70,6 +77,9 @@ export default class AgoraRecorder extends EventEmitter {
 
         fs.mkdirSync(this.recordPath, { recursive: true })
         this.sdk = new AgoraRecorderSdk()
+        if (config.logLevel) {
+            this.sdk.setLogLevel(config.logLevel)
+        }
         this.initEventHandler()
     }
 
@@ -196,10 +206,15 @@ export default class AgoraRecorder extends EventEmitter {
             cfgPath
         )
         return await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                console.error('Joining channel timeout')
+            }, 5000)
             this.once(AgoraRecorderEvent.REC_EVENT_JOIN_CHANNEL, () => {
+                clearTimeout(timeout)
                 resolve(true)
             })
             this.once(AgoraRecorderEvent.REC_EVENT_ERROR, (err) => {
+                clearTimeout(timeout)
                 reject(err)
             })
         })
