@@ -1,6 +1,6 @@
 {
   "name": "agora-recorder",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Recording tool for Agora.io stream service",
   "repository": "https://github.com/webtoucher/agora-recorder",
   "type": "module",
@@ -24,7 +24,7 @@
     "fecha": "4.2.1"
   },
   "devDependencies": {
-    "@types/node": "16.11.7",
-    "typescript": "4.4.4"
+    "@types/node": "16.11.8",
+    "typescript": "4.5.2"
   }
 }

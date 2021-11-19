@@ -45,7 +45,7 @@ export interface AgoraRecorderConfig {
     outputDir?: string,
 
     /**
-     * Closure for building name of the subdirectory for storing current channel videos and logs.
+     * Closure for building name of the subdirectory for storing current channel video and logs.
      * @default ({ channel, date }) => `${formatDate(date, 'YYYY-MM-DD')}/${formatDate(date, 'HH:mm:ss')} ${channel}`
      */
     recordDirTmpl?: ({ channel, date }: { channel: string, date: Date }) => string,
@@ -75,7 +75,7 @@ export default class AgoraRecorder extends EventEmitter {
         }
         this.date = new Date()
 
-        fs.mkdirSync(this.recordPath, { recursive: true })
+        fs.mkdirSync(this.recordFullPath, { recursive: true })
         this.sdk = new AgoraRecorderSdk()
         if (config.logLevel) {
             this.sdk.setLogLevel(config.logLevel)
@@ -91,13 +91,31 @@ export default class AgoraRecorder extends EventEmitter {
     }
 
     /**
-     * Full path of the directory for storing current channel videos and logs.
+     * Path of the directory for storing current channel video and logs.
      */
     get recordPath(): string {
-        return path.resolve(this.config.outputDir, this.config.recordDirTmpl({
+        return this.config.recordDirTmpl({
             channel: this.config.channel,
             date: this.date,
-        }))
+        })
+    }
+
+    /**
+     * Full path of the directory for storing current channel video and logs.
+     */
+    get recordFullPath(): string {
+        return path.resolve(this.config.outputDir, this.recordPath)
+    }
+
+    /**
+     * Full path of the current channel video file.
+     */
+    get videoFullPath(): string | null {
+        const filename = fs.readdirSync(this.recordFullPath).find(filename => /\.mp4$/.test(filename))
+        if (!filename) {
+            return null
+        }
+        return path.join(this.recordFullPath, filename)
     }
 
     initEventHandler(): void {
@@ -186,7 +204,7 @@ export default class AgoraRecorder extends EventEmitter {
      */
     async start(): Promise<boolean> {
         const json = {
-            Recording_Dir: this.recordPath,
+            Recording_Dir: this.recordFullPath,
         }
         const cfgPath = path.join(json.Recording_Dir, '/cfg.json')
         await fsPromises.writeFile(cfgPath, JSON.stringify(json))
